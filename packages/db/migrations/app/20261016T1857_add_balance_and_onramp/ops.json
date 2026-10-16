@@ -1,0 +1,287 @@
+[
+  {
+    "id": "table.Balance",
+    "label": "Create table \"Balance\"",
+    "summary": "Creates table \"Balance\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Balance"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Balance\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Balance\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Balance\"",
+        "sql": "CREATE TABLE \"public\".\"Balance\" (\n  \"amount\" int4 NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"locked\" int4 NOT NULL,\n  \"userId\" int4 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Balance\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Balance\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.OnRampTransaction",
+    "label": "Create table \"OnRampTransaction\"",
+    "summary": "Creates table \"OnRampTransaction\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "OnRampTransaction"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"OnRampTransaction\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"OnRampTransaction\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"OnRampTransaction\"",
+        "sql": "CREATE TABLE \"public\".\"OnRampTransaction\" (\n  \"amount\" int4 NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"provider\" text NOT NULL,\n  \"startTime\" timestamptz NOT NULL,\n  \"status\" text NOT NULL,\n  \"token\" text NOT NULL,\n  \"userId\" int4 NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"OnRampTransaction_status_check_0dc68f5d\" CHECK (\"status\" IN ('Success', 'Failure', 'Processing'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"OnRampTransaction\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"OnRampTransaction\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.Balance.Balance_userId_key",
+    "label": "Add unique constraint on \"Balance\" (userId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "Balance_userId_key",
+        "table": "Balance"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Balance_userId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Balance_userId_key",
+          "public",
+          "\"public\".\"Balance\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"Balance_userId_key\"",
+        "sql": "ALTER TABLE \"public\".\"Balance\" ADD CONSTRAINT \"Balance_userId_key\" UNIQUE (\"userId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"Balance_userId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Balance_userId_key",
+          "public",
+          "\"public\".\"Balance\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.OnRampTransaction.OnRampTransaction_token_key",
+    "label": "Add unique constraint on \"OnRampTransaction\" (token)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "OnRampTransaction_token_key",
+        "table": "OnRampTransaction"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"OnRampTransaction_token_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "OnRampTransaction_token_key",
+          "public",
+          "\"public\".\"OnRampTransaction\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"OnRampTransaction_token_key\"",
+        "sql": "ALTER TABLE \"public\".\"OnRampTransaction\" ADD CONSTRAINT \"OnRampTransaction_token_key\" UNIQUE (\"token\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"OnRampTransaction_token_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "OnRampTransaction_token_key",
+          "public",
+          "\"public\".\"OnRampTransaction\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.OnRampTransaction.OnRampTransaction_userId_idx_a489d58a",
+    "label": "Create index \"OnRampTransaction_userId_idx_a489d58a\" on \"OnRampTransaction\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "OnRampTransaction_userId_idx_a489d58a",
+        "table": "OnRampTransaction"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"OnRampTransaction_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"OnRampTransaction_userId_idx_a489d58a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"OnRampTransaction_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"OnRampTransaction_userId_idx_a489d58a\" ON \"public\".\"OnRampTransaction\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"OnRampTransaction_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"OnRampTransaction_userId_idx_a489d58a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Balance.Balance_userId_fkey",
+    "label": "Add foreign key \"Balance_userId_fkey\" on \"Balance\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Balance_userId_fkey",
+        "table": "Balance"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Balance_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Balance_userId_fkey",
+          "public",
+          "\"public\".\"Balance\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Balance_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Balance\"\nADD CONSTRAINT \"Balance_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"User\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Balance_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Balance_userId_fkey",
+          "public",
+          "\"public\".\"Balance\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.OnRampTransaction.OnRampTransaction_userId_fkey",
+    "label": "Add foreign key \"OnRampTransaction_userId_fkey\" on \"OnRampTransaction\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "OnRampTransaction_userId_fkey",
+        "table": "OnRampTransaction"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"OnRampTransaction_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "OnRampTransaction_userId_fkey",
+          "public",
+          "\"public\".\"OnRampTransaction\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"OnRampTransaction_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"OnRampTransaction\"\nADD CONSTRAINT \"OnRampTransaction_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"User\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"OnRampTransaction_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "OnRampTransaction_userId_fkey",
+          "public",
+          "\"public\".\"OnRampTransaction\""
+        ]
+      }
+    ]
+  }
+]

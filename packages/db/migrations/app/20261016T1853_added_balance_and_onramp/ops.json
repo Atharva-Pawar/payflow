@@ -1,0 +1,583 @@
+[
+  {
+    "id": "table.Balance",
+    "label": "Create table \"Balance\"",
+    "summary": "Creates table \"Balance\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Balance"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Balance\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Balance\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Balance\"",
+        "sql": "CREATE TABLE \"public\".\"Balance\" (\n  \"amount\" int4 NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"locked\" int4 NOT NULL,\n  \"userId\" int4 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Balance\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Balance\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.Merchant",
+    "label": "Create table \"Merchant\"",
+    "summary": "Creates table \"Merchant\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Merchant"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Merchant\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Merchant\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Merchant\"",
+        "sql": "CREATE TABLE \"public\".\"Merchant\" (\n  \"auth_type\" text NOT NULL,\n  \"email\" text NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"name\" text,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"Merchant_auth_type_check_0380e3da\" CHECK (\"auth_type\" IN ('Google', 'Github'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Merchant\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Merchant\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.OnRampTransaction",
+    "label": "Create table \"OnRampTransaction\"",
+    "summary": "Creates table \"OnRampTransaction\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "OnRampTransaction"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"OnRampTransaction\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"OnRampTransaction\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"OnRampTransaction\"",
+        "sql": "CREATE TABLE \"public\".\"OnRampTransaction\" (\n  \"amount\" int4 NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"provider\" text NOT NULL,\n  \"startTime\" timestamptz NOT NULL,\n  \"status\" text NOT NULL,\n  \"token\" text NOT NULL,\n  \"userId\" int4 NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"OnRampTransaction_status_check_0dc68f5d\" CHECK (\"status\" IN ('Success', 'Failure', 'Processing'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"OnRampTransaction\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"OnRampTransaction\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "alterNullability.dropNotNull.User.email",
+    "label": "Drop NOT NULL on \"User\".\"email\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "email",
+        "table": "User"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"email\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "User",
+          "email"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop NOT NULL on \"email\"",
+        "sql": "ALTER TABLE \"public\".\"User\" ALTER COLUMN \"email\" DROP NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"email\" is nullable",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "User",
+          "email",
+          "YES"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.User.number",
+    "label": "Add column number to User",
+    "summary": "Adds column number to table User",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "number",
+        "table": "User"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"number\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "User",
+          "number"
+        ]
+      },
+      {
+        "description": "ensure table \"User\" is empty before adding NOT NULL column without default",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"public\".\"User\" LIMIT 1) AS \"result\"",
+        "params": [],
+        "meta": {
+          "requiredColumn": {
+            "table": "User",
+            "column": "number",
+            "reason": "newField"
+          }
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"number\"",
+        "sql": "ALTER TABLE \"public\".\"User\" ADD COLUMN \"number\" text NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"number\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "User",
+          "number"
+        ]
+      },
+      {
+        "description": "verify column \"number\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "User",
+          "number",
+          "NO"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.User.password",
+    "label": "Add column password to User",
+    "summary": "Adds column password to table User",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "User"
+      }
+    },
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "ensure column \"password\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "User",
+          "password"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"password\"",
+        "sql": "ALTER TABLE \"public\".\"User\" ADD COLUMN \"password\" text DEFAULT ('') NOT NULL"
+      },
+      {
+        "description": "drop temporary default from column \"password\"",
+        "sql": "ALTER TABLE \"public\".\"User\" ALTER COLUMN \"password\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"password\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "User",
+          "password"
+        ]
+      },
+      {
+        "description": "verify column \"password\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "User",
+          "password",
+          "NO"
+        ]
+      },
+      {
+        "description": "verify column \"password\" has no default after temporary default removal",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NOT NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "User",
+          "password"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.Balance.Balance_userId_key",
+    "label": "Add unique constraint on \"Balance\" (userId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "Balance_userId_key",
+        "table": "Balance"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Balance_userId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Balance_userId_key",
+          "public",
+          "\"public\".\"Balance\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"Balance_userId_key\"",
+        "sql": "ALTER TABLE \"public\".\"Balance\" ADD CONSTRAINT \"Balance_userId_key\" UNIQUE (\"userId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"Balance_userId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Balance_userId_key",
+          "public",
+          "\"public\".\"Balance\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.Merchant.Merchant_email_key",
+    "label": "Add unique constraint on \"Merchant\" (email)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "Merchant_email_key",
+        "table": "Merchant"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Merchant_email_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Merchant_email_key",
+          "public",
+          "\"public\".\"Merchant\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"Merchant_email_key\"",
+        "sql": "ALTER TABLE \"public\".\"Merchant\" ADD CONSTRAINT \"Merchant_email_key\" UNIQUE (\"email\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"Merchant_email_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Merchant_email_key",
+          "public",
+          "\"public\".\"Merchant\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.OnRampTransaction.OnRampTransaction_token_key",
+    "label": "Add unique constraint on \"OnRampTransaction\" (token)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "OnRampTransaction_token_key",
+        "table": "OnRampTransaction"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"OnRampTransaction_token_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "OnRampTransaction_token_key",
+          "public",
+          "\"public\".\"OnRampTransaction\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"OnRampTransaction_token_key\"",
+        "sql": "ALTER TABLE \"public\".\"OnRampTransaction\" ADD CONSTRAINT \"OnRampTransaction_token_key\" UNIQUE (\"token\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"OnRampTransaction_token_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "OnRampTransaction_token_key",
+          "public",
+          "\"public\".\"OnRampTransaction\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.User.User_number_key",
+    "label": "Add unique constraint on \"User\" (number)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "User_number_key",
+        "table": "User"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"User_number_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "User_number_key",
+          "public",
+          "\"public\".\"User\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"User_number_key\"",
+        "sql": "ALTER TABLE \"public\".\"User\" ADD CONSTRAINT \"User_number_key\" UNIQUE (\"number\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"User_number_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "User_number_key",
+          "public",
+          "\"public\".\"User\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.OnRampTransaction.OnRampTransaction_userId_idx_a489d58a",
+    "label": "Create index \"OnRampTransaction_userId_idx_a489d58a\" on \"OnRampTransaction\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "OnRampTransaction_userId_idx_a489d58a",
+        "table": "OnRampTransaction"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"OnRampTransaction_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"OnRampTransaction_userId_idx_a489d58a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"OnRampTransaction_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"OnRampTransaction_userId_idx_a489d58a\" ON \"public\".\"OnRampTransaction\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"OnRampTransaction_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"OnRampTransaction_userId_idx_a489d58a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Balance.Balance_userId_fkey",
+    "label": "Add foreign key \"Balance_userId_fkey\" on \"Balance\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Balance_userId_fkey",
+        "table": "Balance"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Balance_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Balance_userId_fkey",
+          "public",
+          "\"public\".\"Balance\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Balance_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Balance\"\nADD CONSTRAINT \"Balance_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"User\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Balance_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Balance_userId_fkey",
+          "public",
+          "\"public\".\"Balance\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.OnRampTransaction.OnRampTransaction_userId_fkey",
+    "label": "Add foreign key \"OnRampTransaction_userId_fkey\" on \"OnRampTransaction\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "OnRampTransaction_userId_fkey",
+        "table": "OnRampTransaction"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"OnRampTransaction_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "OnRampTransaction_userId_fkey",
+          "public",
+          "\"public\".\"OnRampTransaction\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"OnRampTransaction_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"OnRampTransaction\"\nADD CONSTRAINT \"OnRampTransaction_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"User\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"OnRampTransaction_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "OnRampTransaction_userId_fkey",
+          "public",
+          "\"public\".\"OnRampTransaction\""
+        ]
+      }
+    ]
+  }
+]

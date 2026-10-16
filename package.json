@@ -1,5 +1,5 @@
 {
-  "name": "my-turborepo",
+  "name": "payflow",
   "private": true,
   "scripts": {
     "build": "turbo run build",
@@ -9,6 +9,7 @@
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
     "prettier": "3.9.6",
     "turbo": "^2.11.8",
     "typescript": "7.0.2"
@@ -25,5 +26,9 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "postcss": "^8.5.30",
+    "tailwindcss": "^4.3.3"
+  }
 }

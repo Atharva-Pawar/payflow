@@ -1,18 +1,14 @@
-"use client";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
 
-import { ReactNode } from "react";
-
-interface ButtonProps {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
-  className?: string;
-  appName: string;
 }
 
-export const Button = ({ children, className, appName }: ButtonProps) => {
+export const Button = ({ children, ...props }: ButtonProps) => {
   return (
     <button
-      className={className}
-      onClick={() => alert(`Hello from your ${appName} app!`)}
+      {...props}
+      className={`rounded-md bg-black px-4 py-2 text-white ${props.className ?? ""}`}
     >
       {children}
     </button>

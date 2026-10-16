@@ -1,0 +1,17 @@
+{
+  "name": "@repo/store",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./counter": "./src/stores/counter-store.ts",
+    "./balance": "./src/stores/balance-store.ts"
+  },
+  "dependencies": {
+    "zustand": "^5.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
